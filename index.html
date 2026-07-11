@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellable — Find Your Sellable Skills</title>
+<style>
+  :root {
+    --ink: #F4E9D8;
+    --ink-dim: #B8A98F;
+    --bg: #1B2A4A;
+    --bg-panel: #22355C;
+    --gold: #D9A441;
+    --gold-dim: #8A6E2F;
+    --line: #35476D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .stage {
+    width: 100%;
+    max-width: 640px;
+  }
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    margin: 0 0 12px 0;
+    font-weight: 400;
+  }
+  .sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink-dim);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--line);
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .progress-fill {
+    height: 2px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+  .q-count {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--ink-dim);
+    margin-bottom: 16px;
+  }
+  .q-text {
+    font-size: 22px;
+    line-height: 1.4;
+    margin: 0 0 24px 0;
+    font-weight: 400;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .option:hover {
+    border-color: var(--gold);
+    background: rgba(217, 164, 65, 0.06);
+  }
+  .option:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .start-btn, .restart-btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: var(--gold);
+    color: #14161F;
+    border: none;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:hover, .restart-btn:hover { background: #E8B85A; }
+
+  .result-item {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .rank {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .skill-name {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    font-weight: 400;
+  }
+  .skill-why {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink-dim);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .lock-teaser {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px dashed var(--gold-dim);
+    border-radius: 4px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div id="screen-intro">
+    <div class="logo-mark" style="font-family:Georgia,serif; font-size:26px; color:var(--ink); letter-spacing:0.5px; margin-bottom:20px;">
+      <span style="position:relative; display:inline-block;">
+        S
+        <span style="position:absolute; left:50%; top:-4px; transform:translateX(-50%); width:1.5px; height:9px; background:var(--gold);"></span>
+        <span style="position:absolute; left:50%; bottom:-4px; transform:translateX(-50%); width:1.5px; height:9px; background:var(--gold);"></span>
+      </span>ellable
+    </div>
+    <h1>You already have skills worth paying for.<br>You just haven't named them yet.</h1>
+    <p class="sub">Answer 10 quick questions about how you naturally work. No right answers — just the ones that sound most like you. Takes about 2 minutes.</p>
+    <div class="panel" style="text-align:center;">
+      <button class="start-btn" onclick="startQuiz()">Start the assessment</button>
+    </div>
+  </div>
+
+  <div id="screen-quiz" class="hidden">
+    <div class="panel">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="q-count" id="qCount"></div>
+      <p class="q-text" id="qText"></p>
+      <div id="qOptions"></div>
+    </div>
+  </div>
+
+  <div id="screen-results" class="hidden">
+    <div class="eyebrow">Your Results</div>
+    <h1>Your top 3 monetizable skills</h1>
+    <p class="sub">Based on your answers, here's where you're most naturally suited to start selling.</p>
+    <div id="resultsList"></div>
+    <div class="lock-teaser" id="teaserBox">
+      ✨ <strong>Get your personalized starter kit:</strong> enter your email and we'll generate a custom service description, suggested pricing, and your first outreach message — written just for your #1 skill.
+      <form id="emailForm" style="margin-top:16px;" onsubmit="submitEmail(event)">
+        <input type="email" id="emailInput" required placeholder="you@email.com"
+          style="width:100%; padding:12px 14px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; background:var(--bg); border:1px solid var(--line); color:var(--ink); border-radius:3px; margin-bottom:10px;">
+        <button type="submit" class="start-btn" style="width:100%;">Email me my results</button>
+      </form>
+      <p id="emailStatus" style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; color:var(--gold); margin-top:10px; display:none;"></p>
+    </div>
+    <div style="margin-top:24px; text-align:center;">
+      <button class="restart-btn" onclick="location.reload()" style="background:transparent; border:1px solid var(--line); color:var(--ink-dim);">Take it again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---- Skill universe ----
+// Each quiz answer nudges the score of 1-3 of these skills.
+const SKILLS = {
+  writing: { name: "Writing & Copywriting", why: "You think clearly in words and can shape messages that move people to act — the core skill behind blog posts, emails, and ad copy." },
+  social: { name: "Social Media Management", why: "You understand what makes people stop scrolling and engage — brands pay well for someone who can run their voice online." },
+  design: { name: "Graphic Design", why: "You have a visual eye and care about how things look and feel — a skill nearly every small business needs but few have in-house." },
+  video: { name: "Video Editing", why: "You can shape raw footage into something watchable — one of the highest-demand freelance skills right now." },
+  admin: { name: "Virtual Assistant / Admin Support", why: "You're organized and reliable with details — busy founders will pay to hand off exactly that." },
+  bookkeeping: { name: "Bookkeeping & Basic Finance", why: "You're comfortable with numbers and structure — small businesses badly need help keeping their books straight." },
+  coaching: { name: "Coaching & Consulting", why: "You naturally guide people through problems — this turns lived experience directly into paid sessions." },
+  webdesign: { name: "Web Design Basics", why: "You like building things people interact with — even simple website skills are in high demand for small businesses." },
+  research: { name: "Research & Data Gathering", why: "You're thorough and enjoy digging until you find the real answer — a quietly valuable skill for busy decision-makers." },
+  voiceover: { name: "Voiceover & Audio", why: "You're comfortable with your voice and pacing — podcasts, ads, and explainer videos all need this." },
+  events: { name: "Event Planning & Coordination", why: "You like orchestrating moving pieces so things go smoothly — a skill that translates directly to paid coordination work." },
+  service: { name: "Customer Service / Client Care", why: "You're naturally good at making people feel heard and handled — companies pay a premium for that calm competence." }
+};
+
+// ---- Questions ----
+// Each option lists which skills it points toward.
+const QUESTIONS = [
+  {
+    text: "When a friend is stressed about a big decision, you usually...",
+    options: [
+      { label: "Ask questions until they figure out the answer themselves", skills: ["coaching", "service"] },
+      { label: "Research the options for them and lay out the facts", skills: ["research", "bookkeeping"] },
+      { label: "Help them write out exactly what to say or do next", skills: ["writing", "admin"] }
+    ]
+  },
+  {
+    text: "A friend's small business needs help and has zero budget for a team. You'd naturally offer to...",
+    options: [
+      { label: "Clean up their social media and make it look active", skills: ["social", "design"] },
+      { label: "Organize their inbox, calendar, and to-do list", skills: ["admin", "events"] },
+      { label: "Look at their numbers and tell them where the money's leaking", skills: ["bookkeeping", "research"] }
+    ]
+  },
+  {
+    text: "You're most in your element when you're...",
+    options: [
+      { label: "Making something look or sound polished", skills: ["design", "video"] },
+      { label: "Talking someone through a problem out loud", skills: ["coaching", "service"] },
+      { label: "Digging through details nobody else wants to touch", skills: ["research", "bookkeeping"] }
+    ]
+  },
+  {
+    text: "People often ask you for help with...",
+    options: [
+      { label: "Writing something — a message, caption, or post", skills: ["writing", "social"] },
+      { label: "Planning something — a trip, party, or schedule", skills: ["events", "admin"] },
+      { label: "Fixing something — a file, a doc, a website", skills: ["webdesign", "admin"] }
+    ]
+  },
+  {
+    text: "If you had to record yourself talking for 2 minutes, you'd feel...",
+    options: [
+      { label: "Totally comfortable — I like talking", skills: ["voiceover", "coaching"] },
+      { label: "Fine, but I'd rather write it down first", skills: ["writing", "research"] },
+      { label: "I'd rather not — not my thing", skills: ["design", "bookkeeping"] }
+    ]
+  },
+  {
+    text: "Your idea of a satisfying afternoon involves...",
+    options: [
+      { label: "Editing a video or photo until it's just right", skills: ["video", "design"] },
+      { label: "Reorganizing a messy spreadsheet or filing system", skills: ["bookkeeping", "admin"] },
+      { label: "Having a real conversation that helps someone shift their thinking", skills: ["coaching", "service"] }
+    ]
+  },
+  {
+    text: "When something goes wrong for a customer or client, you naturally...",
+    options: [
+      { label: "Stay calm and make them feel taken care of", skills: ["service", "coaching"] },
+      { label: "Figure out exactly what broke and fix the process", skills: ["research", "webdesign"] },
+      { label: "Write a message that smooths things over perfectly", skills: ["writing", "service"] }
+    ]
+  },
+  {
+    text: "A blank page or empty template makes you feel...",
+    options: [
+      { label: "Excited — I like starting from nothing", skills: ["writing", "design"] },
+      { label: "Fine, as long as there's a clear structure to follow", skills: ["admin", "bookkeeping"] },
+      { label: "A little overwhelmed — I prefer improving something that exists", skills: ["webdesign", "video"] }
+    ]
+  },
+  {
+    text: "Which compliment do you hear most often?",
+    options: [
+      { label: "\"You always know what to say.\"", skills: ["writing", "coaching"] },
+      { label: "\"You're so organized, it's kind of amazing.\"", skills: ["admin", "bookkeeping"] },
+      { label: "\"You have a great eye/ear for this.\"", skills: ["design", "voiceover"] }
+    ]
+  },
+  {
+    text: "If someone paid you today for a skill you already have, you'd guess it'd be for...",
+    options: [
+      { label: "Helping them communicate or create content", skills: ["writing", "social", "video"] },
+      { label: "Helping them get organized or handle logistics", skills: ["admin", "events", "bookkeeping"] },
+      { label: "Helping them think clearly or feel supported", skills: ["coaching", "service"] }
+    ]
+  },
+  {
+    text: "When you finish a project, what feels most satisfying?",
+    options: [
+      { label: "Seeing something concrete and polished you produced", skills: ["design", "video"] },
+      { label: "Knowing everything got done correctly and on time", skills: ["admin", "bookkeeping"] },
+      { label: "Knowing you helped someone feel better or think differently", skills: ["coaching", "service"] }
+    ]
+  },
+  {
+    text: "If you started a side hustle tomorrow, what would be the hardest part?",
+    options: [
+      { label: "Figuring out what to charge", skills: ["bookkeeping", "research"] },
+      { label: "Putting myself out there and talking to people", skills: ["social", "voiceover"] },
+      { label: "Actually finding time in an already packed schedule", skills: ["admin", "events"] }
+    ]
+  },
+  {
+    text: "Which of these has someone paid you for before, even informally?",
+    options: [
+      { label: "Writing or creating something for them", skills: ["writing", "social"] },
+      { label: "Organizing or planning something for them", skills: ["events", "admin"] },
+      { label: "Advising or coaching them through something", skills: ["coaching", "service"] }
+    ]
+  },
+  {
+    text: "What kind of feedback do you give best?",
+    options: [
+      { label: "Detailed and structural — what's broken and how to fix it", skills: ["webdesign", "research"] },
+      { label: "Emotional support with a clear next step", skills: ["coaching", "service"] },
+      { label: "Polish — how to make it look or sound better", skills: ["design", "voiceover"] }
+    ]
+  },
+  {
+    text: "Pick the task you'd actually enjoy doing for a stranger, for money.",
+    options: [
+      { label: "Editing their video or redesigning their resume", skills: ["video", "design"] },
+      { label: "Managing their social calendar or planning their event", skills: ["social", "events"] },
+      { label: "Digging up information they don't have time to find", skills: ["research", "bookkeeping"] }
+    ]
+  }
+];
+
+let current = 0;
+let scores = {};
+Object.keys(SKILLS).forEach(k => scores[k] = 0);
+
+function startQuiz() {
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  document.getElementById('qCount').textContent = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('progressFill').style.width = `${(current / QUESTIONS.length) * 100}%`;
+
+  const optsDiv = document.getElementById('qOptions');
+  optsDiv.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt.label;
+    btn.onclick = () => selectOption(opt);
+    optsDiv.appendChild(btn);
+  });
+}
+
+function selectOption(opt) {
+  opt.skills.forEach(skillKey => {
+    scores[skillKey] = (scores[skillKey] || 0) + 1;
+  });
+  current++;
+  if (current < QUESTIONS.length) {
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+let latestResultsText = '';
+let latestRanked = []; // stores the top 3 [key, score] pairs so the email step reuses the exact same ranking shown on screen
+
+// Optional data logger: sends an anonymous copy of every quiz result
+// (no email required) to your Formspree dashboard, so you can see
+// patterns over time. Paste your Formspree link below once you have one.
+// If left as the placeholder, this silently does nothing - it never
+// blocks or slows down the person's experience.
+const FORMSPREE_DATA_ENDPOINT = "PASTE_YOUR_FORMSPREE_LINK_HERE";
+
+function logQuizData(ranked) {
+  if (FORMSPREE_DATA_ENDPOINT.includes("PASTE_YOUR_FORMSPREE_LINK_HERE")) return;
+  fetch(FORMSPREE_DATA_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      top_skill: ranked[0] ? ranked[0][0] : '',
+      second_skill: ranked[1] ? ranked[1][0] : '',
+      third_skill: ranked[2] ? ranked[2][0] : '',
+      all_scores: JSON.stringify(scores),
+      timestamp: new Date().toISOString()
+    })
+  }).catch(() => {}); // fail silently - a logging hiccup should never interrupt the quiz
+}
+
+// Ranks skills by score, but shuffles first so that when two or more
+// skills are tied, which one "wins" the tie is random each time,
+// instead of always favoring whichever skill happens to be listed
+// first in the SKILLS object.
+function getRankedSkills() {
+  const entries = Object.entries(scores);
+  for (let i = entries.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [entries[i], entries[j]] = [entries[j], entries[i]];
+  }
+  entries.sort((a, b) => b[1] - a[1]);
+  return entries.slice(0, 3);
+}
+
+function showResults() {
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-results').classList.remove('hidden');
+
+  const ranked = getRankedSkills();
+  latestRanked = ranked;
+
+  const container = document.getElementById('resultsList');
+  container.innerHTML = '';
+  const rankLabels = ['#1 Match', '#2 Match', '#3 Match'];
+  const textLines = [];
+
+  ranked.forEach(([key, score], i) => {
+    const skill = SKILLS[key];
+    const item = document.createElement('div');
+    item.className = 'result-item';
+    item.innerHTML = `
+      <div class="rank">${rankLabels[i]}</div>
+      <h2 class="skill-name">${skill.name}</h2>
+      <p class="skill-why">${skill.why}</p>
+    `;
+    container.appendChild(item);
+    textLines.push(`${rankLabels[i]}: ${skill.name} — ${skill.why}`);
+  });
+
+  latestResultsText = textLines.join('\n');
+  logQuizData(ranked);
+}
+
+// This calls our AI agent (generate-starter-kit.js), which asks Claude
+// to write a personalized starter kit and emails it to the person.
+async function submitEmail(event) {
+  event.preventDefault();
+  const email = document.getElementById('emailInput').value;
+  const statusEl = document.getElementById('emailStatus');
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+
+  // Reuse the exact same ranking already shown on screen, rather than
+  // re-ranking (which, with the shuffle above, could otherwise produce
+  // a different order than what the person already saw).
+  const topSkills = latestRanked.map(([key]) => ({
+    name: SKILLS[key].name,
+    why: SKILLS[key].why
+  }));
+  const firstName = ''; // left blank for now; could add a name field to the form later
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Putting your results together...";
+
+  try {
+    const response = await fetch('/.netlify/functions/generate-starter-kit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, firstName, topSkills })
+    });
+
+    const data = await response.json();
+
+    statusEl.style.display = 'block';
+    if (data.success) {
+      statusEl.style.color = 'var(--gold)';
+      statusEl.textContent = "Done — check your inbox for your personalized starter kit.";
+      document.getElementById('emailForm').classList.add('hidden');
+    } else {
+      statusEl.style.color = '#D97757';
+      statusEl.textContent = "Something went wrong — please try again.";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Email me my results";
+    }
+  } catch (err) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#D97757';
+    statusEl.textContent = "Something went wrong — please try again.";
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Email me my results";
+  }
+}
+</script>
+</body>
+</html>
