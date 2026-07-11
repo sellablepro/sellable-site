@@ -31,7 +31,7 @@ exports.handler = async function (event) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5',
         max_tokens: 800,
         messages: [
           {
@@ -55,6 +55,14 @@ Keep the tone warm, plain, and encouraging. No jargon. Do not use markdown symbo
       })
     });
 
+    if (!claudeResponse.ok) {
+      const claudeErrorText = await claudeResponse.text();
+      return {
+        statusCode: 502,
+        body: JSON.stringify({ error: `Claude API failed: ${claudeErrorText}` })
+      };
+    }
+
     const claudeData = await claudeResponse.json();
     const starterKitText =
       claudeData?.content?.[0]?.text ||
@@ -74,7 +82,7 @@ Here's your personalized starter kit for ${first.name}:
 
 ${starterKitText}
 
-One small thing you can do today, right now: tell one person what you're good at. Text or tell a friend, "hey, I think I could actually get paid for ${first.name.toLowerCase()}." Most people never say this out loud — and it's often what makes it feel real.
+One small thing you can do today, right now: tell one person what you're good at. Text or tell a friend, "Hey, I think I could actually get paid for ${first.name.toLowerCase()}." Most people never say this out loud — and it's often what makes it feel real.
 
 Talk soon,
 The Sellable Team`;
