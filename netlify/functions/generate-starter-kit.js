@@ -80,7 +80,7 @@ Talk soon,
 The Sellable Team`;
 
     // ---- STEP 3: Send the email using Resend ----
-    await fetch('https://api.resend.com/emails', {
+    const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,6 +93,14 @@ The Sellable Team`;
         text: emailBody
       })
     });
+
+    if (!resendResponse.ok) {
+      const resendError = await resendResponse.text();
+      return {
+        statusCode: 502,
+        body: JSON.stringify({ error: `Email sending failed: ${resendError}` })
+      };
+    }
 
     return {
       statusCode: 200,

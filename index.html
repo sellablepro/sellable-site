@@ -492,7 +492,7 @@ async function submitEmail(event) {
       document.getElementById('emailForm').classList.add('hidden');
     } else {
       statusEl.style.color = '#D97757';
-      statusEl.textContent = "Something went wrong — please try again.";
+      statusEl.textContent = data.error ? `Error: ${data.error}` : "Something went wrong — please try again.";
       submitBtn.disabled = false;
       submitBtn.textContent = "Email me my results";
     }
